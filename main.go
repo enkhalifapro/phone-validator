@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
 
@@ -26,16 +27,25 @@ func main() {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	db, err := sql.Open("sqlite3", "./sample.db")
+	sql.Register("sqlite3_with_extensions",
+		&sqlite3.SQLiteDriver{
+			Extensions: []string{
+				"sqlite3_mod_regexp",
+			},
+		})
+	db, err := sql.Open("sqlite3_with_extensions", "./sample.db")
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
 	phoneMgr := phones.New(db)
 
 	// register country routes
-	countryHandler := api.NewCountryHandler(phoneMgr)
-	r.GET("/countries", countryHandler.List)
+	phoneHandler := api.NewPhoneHandler(phoneMgr)
+
+	r.GET("/phones", phoneHandler.ListPhones)
+	r.GET("/countries", phoneHandler.ListCountries)
 
 	fmt.Println("Server started at port 3000")
 	log.Fatal(http.ListenAndServe(":3000", r))

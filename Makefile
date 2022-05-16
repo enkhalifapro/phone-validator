@@ -1,13 +1,16 @@
 SERVICE = phone-validator
 PKG_LIST = $(shell go list ./... | grep -v mock)
 
+sqlite :
+	$(MAKE) -C ./db
 
 clean:
 	rm -rf ./bin
 
-build: clean
+build: sqlite clean
 	mkdir bin
 	GOOS=linux GOARCH=amd64 go build -o bin/$(SERVICE) main.go
+	ls
 
 build-osx: clean
 	mkdir bin
