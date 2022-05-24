@@ -24,3 +24,9 @@ test:
 
 lint:
 	golint -set_exit_status $(PKG_LIST)
+
+docker-build:
+	docker build . -t $(SERVICE)
+
+docker-run:
+	docker run -it -p 3000:3000 phone-validator

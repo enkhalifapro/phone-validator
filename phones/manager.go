@@ -3,7 +3,6 @@ package phones
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"regexp"
 )
 
@@ -25,11 +24,11 @@ func New(db DBConnector) *Manager {
 
 func initCountries() map[string]Country {
 	countriesMap := make(map[string]Country)
-	countriesMap["+237"] = Country{Code: "+237", Name: "Cameroon", RegExp: `\(237\)\ ?[2368]\d{7,8}$`}
-	countriesMap["+251"] = Country{Code: "+251", Name: "Ethiopia", RegExp: `\(251\)\ ?[1-59]\d{8}$`}
-	countriesMap["+212"] = Country{Code: "+212", Name: "Morocco", RegExp: `\(212\)\ ?[5-9]\d{8}$`}
-	countriesMap["+258"] = Country{Code: "+258", Name: "Mozambique", RegExp: `\(258\)\ ?[28]\d{7,8}$`}
-	countriesMap["+256"] = Country{Code: "+256", Name: "Uganda", RegExp: `\(256\)\ ?\d{9}$`}
+	countriesMap["Cameroon"] = Country{Code: "+237", Name: "Cameroon", RegExp: `\(237\)\ ?[2368]\d{7,8}$`}
+	countriesMap["Ethiopia"] = Country{Code: "+251", Name: "Ethiopia", RegExp: `\(251\)\ ?[1-59]\d{8}$`}
+	countriesMap["Morocco"] = Country{Code: "+212", Name: "Morocco", RegExp: `\(212\)\ ?[5-9]\d{8}$`}
+	countriesMap["Mozambique"] = Country{Code: "+258", Name: "Mozambique", RegExp: `\(258\)\ ?[28]\d{7,8}$`}
+	countriesMap["Uganda"] = Country{Code: "+256", Name: "Uganda", RegExp: `\(256\)\ ?\d{9}$`}
 
 	return countriesMap
 }
@@ -57,13 +56,11 @@ func (m *Manager) GetPhones() ([]*Phone, error) {
 	return phones, nil
 }
 
-func (m *Manager) GetPhonesByCountry(countryCode string) ([]*Phone, error) {
-	country, ok := m.countriesMap[countryCode]
+func (m *Manager) GetPhonesByCountry(countryName string) ([]*Phone, error) {
+	country, ok := m.countriesMap[countryName]
 	if !ok {
 		return []*Phone{}, errors.New("unknown country")
 	}
-	x:=country.RegExp
-	fmt.Println(x)
 	rows, err := m.db.Query("SELECT id, name, phone FROM customer WHERE phone REGEXP ?", country.RegExp)
 	if err != nil {
 		return nil, err

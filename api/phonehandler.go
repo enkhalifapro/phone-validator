@@ -14,7 +14,7 @@ type PhoneHandler struct {
 
 type PhoneManager interface {
 	GetPhones() ([]*phones.Phone, error)
-	GetPhonesByCountry(countryCode string) ([]*phones.Phone, error)
+	GetPhonesByCountry(countryName string) ([]*phones.Phone, error)
 	GetCountries() map[string]phones.Country
 }
 
@@ -23,7 +23,22 @@ func NewPhoneHandler(mgr PhoneManager) *PhoneHandler {
 }
 
 func (c *PhoneHandler) ListPhones(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	phons, err := c.phoneManager.GetPhonesByCountry("+237")
+	phons, err := c.phoneManager.GetPhones()
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	j, err := json.Marshal(phons)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	renderJson(w, j, http.StatusOK)
+}
+
+func (c *PhoneHandler) GetPhonesByCountry(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	countryName := params.ByName("countryName")
+	phons, err := c.phoneManager.GetPhonesByCountry(countryName)
 	if err != nil {
 		fmt.Print(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

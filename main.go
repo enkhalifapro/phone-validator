@@ -45,6 +45,7 @@ func main() {
 	phoneHandler := api.NewPhoneHandler(phoneMgr)
 
 	r.GET("/phones", phoneHandler.ListPhones)
+	r.GET("/phones/:countryName", phoneHandler.GetPhonesByCountry)
 	r.GET("/countries", phoneHandler.ListCountries)
 
 	fmt.Println("Server started at port 3000")
