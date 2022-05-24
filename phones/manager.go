@@ -3,6 +3,7 @@ package phones
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"regexp"
 )
 
@@ -33,8 +34,11 @@ func initCountries() map[string]Country {
 	return countriesMap
 }
 
-func (m *Manager) GetPhones() ([]*Phone, error) {
-	rows, err := m.db.Query("SELECT id, name, phone FROM customer")
+func (m *Manager) GetPhones(limit int, skip int) ([]*Phone, error) {
+	fmt.Println("deeeeee")
+	fmt.Println(limit)
+	fmt.Println(skip)
+	rows, err := m.db.Query("SELECT id, name, phone FROM customer LIMIT ? OFFSET ?", limit, skip)
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +56,12 @@ func (m *Manager) GetPhones() ([]*Phone, error) {
 	return phones, nil
 }
 
-func (m *Manager) GetPhonesByCountry(countryName string) ([]*Phone, error) {
+func (m *Manager) GetPhonesByCountry(limit int, skip int, countryName string) ([]*Phone, error) {
 	country, ok := m.countriesMap[countryName]
 	if !ok {
 		return []*Phone{}, errors.New("unknown country")
 	}
-	rows, err := m.db.Query("SELECT id, name, phone FROM customer WHERE phone REGEXP ?", country.RegExp)
+	rows, err := m.db.Query("SELECT id, name, phone FROM customer WHERE phone REGEXP ? LIMIT ? OFFSET ?", country.RegExp, limit, skip)
 	if err != nil {
 		return nil, err
 	}
@@ -92,5 +96,4 @@ func (m *Manager) enrichCountry(phone *Phone) {
 	phone.CountryName = "UNKNOWN"
 	phone.CountryCode = "UNKNOWN"
 	phone.State = "not valid"
-
 }
