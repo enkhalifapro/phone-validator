@@ -6,14 +6,12 @@ sqlite :
 
 clean:
 	rm -rf ./bin
+	mkdir bin
 
 build: sqlite clean
-	mkdir bin
 	GOOS=linux GOARCH=amd64 go build -o bin/$(SERVICE) main.go
-	ls
 
 build-osx: clean
-	mkdir bin
 	go build -o bin/$(SERVICE) main.go
 
 run:
