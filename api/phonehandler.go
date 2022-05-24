@@ -9,20 +9,24 @@ import (
 	"strconv"
 )
 
+// PhoneHandler contains phone handlers
 type PhoneHandler struct {
 	phoneManager PhoneManager
 }
 
+// PhoneManager describes phone management functionalities
 type PhoneManager interface {
 	GetPhones(limit int, skip int) ([]*phones.Phone, error)
 	GetPhonesByCountry(limit int, skip int, countryName string) ([]*phones.Phone, error)
 	GetCountries() map[string]phones.Country
 }
 
+// NewPhoneHandler creates a new instance
 func NewPhoneHandler(mgr PhoneManager) *PhoneHandler {
 	return &PhoneHandler{phoneManager: mgr}
 }
 
+// ListPhones ...
 func (c *PhoneHandler) ListPhones(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	pageNumber, err := strconv.Atoi(r.URL.Query().Get("pageNumber"))
 	if err != nil {
@@ -43,9 +47,10 @@ func (c *PhoneHandler) ListPhones(w http.ResponseWriter, r *http.Request, params
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	renderJson(w, j, http.StatusOK)
+	renderJSON(w, j, http.StatusOK)
 }
 
+// GetPhonesByCountry ...
 func (c *PhoneHandler) GetPhonesByCountry(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	pageNumber, err := strconv.Atoi(r.URL.Query().Get("pageNumber"))
 	if err != nil {
@@ -67,9 +72,10 @@ func (c *PhoneHandler) GetPhonesByCountry(w http.ResponseWriter, r *http.Request
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	renderJson(w, j, http.StatusOK)
+	renderJSON(w, j, http.StatusOK)
 }
 
+// ListCountries returns hardcoded countries
 func (c *PhoneHandler) ListCountries(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	countries := c.phoneManager.GetCountries()
 	j, err := json.Marshal(countries)
@@ -77,5 +83,5 @@ func (c *PhoneHandler) ListCountries(w http.ResponseWriter, r *http.Request, _ h
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	renderJson(w, j, http.StatusOK)
+	renderJSON(w, j, http.StatusOK)
 }

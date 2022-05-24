@@ -3,19 +3,22 @@ package phones
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"regexp"
 )
 
+// DBConnector describes data access functionalities
+// ex. Query: query db using sql with parameters
 type DBConnector interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
+// Manager holds phone management functionalities
 type Manager struct {
 	db           DBConnector
 	countriesMap map[string]Country
 }
 
+// New creates a new manager instance
 func New(db DBConnector) *Manager {
 	return &Manager{
 		db:           db,
@@ -34,10 +37,8 @@ func initCountries() map[string]Country {
 	return countriesMap
 }
 
+// GetPhones list in pages
 func (m *Manager) GetPhones(limit int, skip int) ([]*Phone, error) {
-	fmt.Println("deeeeee")
-	fmt.Println(limit)
-	fmt.Println(skip)
 	rows, err := m.db.Query("SELECT id, name, phone FROM customer LIMIT ? OFFSET ?", limit, skip)
 	if err != nil {
 		return nil, err
@@ -56,6 +57,7 @@ func (m *Manager) GetPhones(limit int, skip int) ([]*Phone, error) {
 	return phones, nil
 }
 
+// GetPhonesByCountry using countryName in pages
 func (m *Manager) GetPhonesByCountry(limit int, skip int, countryName string) ([]*Phone, error) {
 	country, ok := m.countriesMap[countryName]
 	if !ok {
@@ -79,6 +81,7 @@ func (m *Manager) GetPhonesByCountry(limit int, skip int, countryName string) ([
 	return phones, nil
 }
 
+// GetCountries list all countries that's hardcoded in init
 func (m *Manager) GetCountries() map[string]Country {
 	return m.countriesMap
 }
