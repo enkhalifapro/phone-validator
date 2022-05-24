@@ -46,13 +46,9 @@ func (m *Manager) GetPhones() ([]*Phone, error) {
 		if err != nil {
 			return nil, err
 		}
-		c := m.getPhoneCountry(phone.Phone)
-		phone.CountryCode = c.Code
-		phone.CountryName = c.Name
-
+		m.enrichCountry(phone)
 		phones = append(phones, phone)
 	}
-
 	return phones, nil
 }
 
@@ -73,13 +69,9 @@ func (m *Manager) GetPhonesByCountry(countryName string) ([]*Phone, error) {
 		if err != nil {
 			return nil, err
 		}
-		c := m.getPhoneCountry(phone.Phone)
-		phone.CountryCode = c.Code
-		phone.CountryName = c.Name
-
+		m.enrichCountry(phone)
 		phones = append(phones, phone)
 	}
-
 	return phones, nil
 }
 
@@ -87,43 +79,18 @@ func (m *Manager) GetCountries() map[string]Country {
 	return m.countriesMap
 }
 
-/*
-func (m *Manager) GetCountriesFromDB() ([]*Country, error) {
-	rows, err := m.db.Query("select phone from customer")
-	if err != nil {
-		return nil, err
-	}
-
-	countries := make([]*Country, 0)
-	foundCountries := make(map[string]bool)
-	for rows.Next() {
-		var phone string
-		err = rows.Scan(&phone)
-		if err != nil {
-			return nil, err
-		}
-
-		c := getPhoneCountry(phone)
-		if _, ok := foundCountries[c.Code]; !ok {
-			countries = append(countries, c)
-			foundCountries[c.Code] = true
-		}
-	}
-
-	return countries, nil
-}
-*/
-func (m *Manager) getPhoneCountry(phone string) *Country {
+func (m *Manager) enrichCountry(phone *Phone) {
 	for _, c := range m.countriesMap {
-		match, _ := regexp.MatchString(c.RegExp, phone)
+		match, _ := regexp.MatchString(c.RegExp, phone.Phone)
 		if match {
-			return &c
+			phone.CountryName = c.Name
+			phone.CountryCode = c.Code
+			phone.State = "valid"
+			return
 		}
 	}
-
-	return &Country{
-		Code: "",
-		Name: "UNKNOWN",
-	}
+	phone.CountryName = "UNKNOWN"
+	phone.CountryCode = "UNKNOWN"
+	phone.State = "not valid"
 
 }
