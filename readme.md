@@ -1,5 +1,5 @@
 # Phone Validator
-a single page application in Go (Frameworks allowed) that uses the provided database (SQLite 3) to list and categorize country phone numbers.
+A single page application in Go (Frameworks allowed) that uses the provided database (SQLite 3) to list and categorize country phone numbers.
 
 # API
 ``GET /phones?pageNumber=1&pageSize=10`` List all phones with (optional) paging enabled.
