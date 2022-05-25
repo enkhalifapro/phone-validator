@@ -3,7 +3,8 @@ a single page application in Go (Frameworks allowed) that uses the provided data
 
 # API
 ``GET /phones?pageNumber=1&pageSize=10`` List all phones with (optional) paging enabled.
-``/phones/:countryName?pageNumber=1&pageSize=10`` List all phones filtered by country name with (optional) paging enabled.
+
+``GET /phones/:countryName?pageNumber=1&pageSize=10`` List all phones filtered by country name with (optional) paging enabled.
 
 # Make jobs
 - build: runs build for Linux OS.
