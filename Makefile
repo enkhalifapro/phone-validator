@@ -18,7 +18,7 @@ run:
 	go run main.go
 
 test:
-	go test ./...
+	go test -v -cover ./...
 
 lint:
 	golint -set_exit_status $(PKG_LIST)
